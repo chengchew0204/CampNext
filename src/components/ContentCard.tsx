@@ -155,7 +155,7 @@ export default function ContentCard({
               <div className="card-content-container">
                 {contentState.loading && (
                   <div className="card-content-loading">
-                    <p>Loadinf...</p>
+                    <p>Loading...</p>
                   </div>
                 )}
                 
