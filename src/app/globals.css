@@ -328,3 +328,58 @@ h2 {
     padding: 60px 15px 150px;
   }
 }
+
+/* Menu item styling */
+.menu-item {
+  color: rgba(245, 245, 245, 0.95) !important;
+  font-weight: 500;
+  font-size: 22px;
+  text-shadow: rgba(0, 0, 0, 1) 0 0 30px, rgba(0, 0, 0, 0.8) 0 0 30px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease-out;
+  margin: 10px 0;
+  line-height: unset;
+  opacity: 0.95;
+}
+
+.menu-item:hover {
+  opacity: 1;
+  transform: translateX(5px);
+}
+
+/* Menu arrow hover effects */
+.menu-arrow {
+  width: 16px;
+  height: auto;
+  margin-left: 2px;
+  filter: brightness(0) invert(1);
+  transform: rotate(-90deg);
+  transition: transform 0.5s;
+  display: inline;
+  vertical-align: middle;
+  position: relative;
+  top: -1.75px;
+}
+
+.menu-item:hover .menu-arrow {
+  transform: rotate(0deg);
+}
+
+/* Hover content for VOLUNTARIXS */
+.hover-content {
+  display: none;
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 20px;
+  border: 1px solid white;
+  background-color: white;
+  padding: 3.5px;
+  line-height: 0;
+  box-sizing: border-box;
+  z-index: 50;
+}
+
+.menu-item:hover .hover-content {
+  display: block;
+}
