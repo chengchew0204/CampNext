@@ -19,7 +19,7 @@ export default async function Home() {
   return (
     <>
       <div className="scroll-container">
-        {posts.map((post, index) => (
+        {posts.map((post) => (
           <section key={post.id} className="scroll-section">
             <BackgroundMedia
               videoUrl={post.videoUrl}

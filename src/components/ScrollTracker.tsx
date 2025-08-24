@@ -185,8 +185,6 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
     );
   }
 
-  const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 1000;
-
   return (
     <>
       {/* SEO Management */}
