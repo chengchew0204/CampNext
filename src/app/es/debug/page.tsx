@@ -1,4 +1,5 @@
 import { fetchWordPressPosts } from '@/utils/wordpress';
+import Image from 'next/image';
 
 export default async function SpanishDebugPage() {
   const posts = await fetchWordPressPosts('es');
@@ -22,9 +23,11 @@ export default async function SpanishDebugPage() {
                 <h3 className="font-medium text-gray-700">Imagen destacada:</h3>
                 {post.featureImage ? (
                   <div className="mt-2">
-                    <img 
+                    <Image 
                       src={post.featureImage} 
                       alt="Imagen destacada" 
+                      width={400}
+                      height={192}
                       className="w-full h-48 object-cover rounded"
                     />
                     <p className="text-sm text-gray-600 mt-1">{post.featureImage}</p>

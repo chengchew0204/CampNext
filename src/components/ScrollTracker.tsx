@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { getSlideTitleById } from '@/utils/slideTitles';
 import { useWordPressContent } from '@/hooks/useWordPressContent';
-import PageOverlay from './PageOverlay';
+import Image from 'next/image';
 
 interface ScrollTrackerProps {
   posts: Array<{ id: number }>;
@@ -18,7 +18,7 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
   const observerRef = useRef<IntersectionObserver | null>(null);
   
   // WordPress content management
-  const { fetchPostContent, clearPostContent, getPostContent } = useWordPressContent();
+  const { fetchPostContent, getPostContent } = useWordPressContent();
 
   // Menu data with post IDs and titles
   const menuItems = [
@@ -46,15 +46,7 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
     
     // If expanding, fetch content for current post
     if (newExpandedState && posts[currentSlideIndex]) {
-      const currentPost = posts[currentSlideIndex];
-      fetchPostContent(currentPost.id);
-    }
-    
-    // If collapsing, optionally clear content to free memory
-    if (!newExpandedState && posts[currentSlideIndex]) {
-      const currentPost = posts[currentSlideIndex];
-      // Uncomment the line below if you want to clear content when closing
-      // clearPostContent(currentPost.id);
+      fetchPostContent(posts[currentSlideIndex].id);
     }
   };
 
@@ -150,15 +142,7 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
       
       // If expanding, fetch content for current post
       if (newExpandedState && posts[currentSlideIndex]) {
-        const currentPost = posts[currentSlideIndex];
-        fetchPostContent(currentPost.id);
-      }
-      
-      // If collapsing, optionally clear content to free memory
-      if (!newExpandedState && posts[currentSlideIndex]) {
-        const currentPost = posts[currentSlideIndex];
-        // Uncomment the line below if you want to clear content when closing
-        // clearPostContent(currentPost.id);
+        fetchPostContent(posts[currentSlideIndex].id);
       }
     };
 
@@ -208,10 +192,9 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
         scrollContainer.removeEventListener('click', handleContainerClick);
       }
     };
-  }, [posts.length, isExpanded, currentSlideIndex, fetchPostContent]);
+  }, [posts, isExpanded, currentSlideIndex, fetchPostContent]);
 
-  const currentPost = posts[currentSlideIndex];
-  const currentTitle = currentPost ? getSlideTitleById(currentPost.id) : "CAMP";
+  // Current post and title are available if needed for future features
 
 
 
@@ -222,7 +205,7 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
         {/* Top Right - Logo */}
         <div className="absolute top-5 right-5 pointer-events-auto">
           <div className="w-25 h-25">
-            <img
+            <Image
               width={100}
               height={100}
               src="https://camp.mx/wp-content/uploads/2023/12/logo.png"
@@ -266,16 +249,19 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
                   {item.title}
                   {item.isSpecial && (
                     <>
-                      <img 
+                      <Image 
                         src="https://camp.mx/img/caret28.svg" 
                         className="menu-arrow"
+                        width={28}
+                        height={28}
                         alt=""
                       />
                       <div className="hover-content" style={{ marginLeft: '70px' }}>
                         <a href="https://worldpackers.com/locations/camp" target="_blank" rel="noopener noreferrer">
-                          <img 
+                          <Image 
                             alt="" 
-                            width="280" 
+                            width={280} 
+                            height={200}
                             src="https://camp.mx/wp-content/uploads/worldpackers.jpg" 
                             style={{ display: 'block', margin: '0', border: 'medium' }}
                           />
@@ -346,7 +332,7 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="w-25 h-25">
-            <img
+            <Image
               width={100}
               height={100}
               src="https://camp.mx/wp-content/uploads/2023/12/logo.png"
@@ -366,8 +352,7 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
             <div className="card-content">
               <div className="card-content-container">
                 {(() => {
-                  const currentPost = posts[currentSlideIndex];
-                  const contentState = getPostContent(currentPost.id);
+                  const contentState = getPostContent(posts[currentSlideIndex].id);
                   
                   if (contentState.loading) {
                     return (
@@ -412,9 +397,11 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
         <div className="slide_10">
           <div className="caretdiv" onClick={handleTitleClick}>
             <a>
-              <img 
+              <Image 
                 src="https://camp.mx/img/caret28.svg" 
                 alt="Expand content" 
+                width={28}
+                height={28}
                 style={{ 
                   filter: 'invert(1)', 
                   width: '28px', 
@@ -426,9 +413,11 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
           
           {/* Mobile caret for iPhone */}
           <div className="caretdiviphone" onClick={handleTitleClick}>
-            <img 
+            <Image 
               src="https://camp.mx/img/caret28.svg" 
               alt="Expand content" 
+              width={28}
+              height={28}
               style={{ 
                 filter: 'invert(1)', 
                 width: '28px', 

@@ -11,7 +11,7 @@ interface PageOverlayProps {
 export default function PageOverlay({ currentSlideTitle = "MAPA", scrollY = 0 }: PageOverlayProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleScreenClick = (e: React.MouseEvent) => {
+  const handleScreenClick = () => {
     console.log('Screen clicked, current state:', isExpanded);
     setIsExpanded(!isExpanded);
   };

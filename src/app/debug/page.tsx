@@ -1,4 +1,5 @@
 import { fetchWordPressPosts } from '@/utils/wordpress';
+import Image from 'next/image';
 
 export default async function DebugPage() {
   const posts = await fetchWordPressPosts('en');
@@ -22,9 +23,11 @@ export default async function DebugPage() {
                 <h3 className="font-medium text-gray-700">Feature Image:</h3>
                 {post.featureImage ? (
                   <div className="mt-2">
-                    <img 
+                    <Image 
                       src={post.featureImage} 
                       alt="Feature" 
+                      width={400}
+                      height={192}
                       className="w-full h-48 object-cover rounded"
                     />
                     <p className="text-sm text-gray-600 mt-1">{post.featureImage}</p>

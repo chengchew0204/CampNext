@@ -45,7 +45,7 @@ export function useWordPressContent(): UseWordPressContentReturn {
       let cleanContent = post.content.rendered;
       
       // Remove video elements since they're handled as background
-      cleanContent = cleanContent.replace(/<video[^>]*>.*?<\/video>/gis, '');
+      cleanContent = cleanContent.replace(/<video[^>]*>[\s\S]*?<\/video>/gi, '');
       // Remove source elements
       cleanContent = cleanContent.replace(/<source[^>]*\/?>/gi, '');
       // Remove empty paragraphs
