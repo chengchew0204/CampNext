@@ -19,15 +19,15 @@ export default async function Home() {
   return (
     <>
       <div className="scroll-container">
-        {posts.map((post) => (
+        {posts.map((post, index) => (
           <section key={post.id} className="scroll-section">
             <BackgroundMedia
               videoUrl={post.videoUrl}
               imageUrl={post.featureImage}
             />
-            {/* Content layer - currently empty as requested */}
+            {/* Content layer with enhanced card system */}
             <div className="relative z-10 h-full w-full">
-              {/* Future content can be added here */}
+              {/* Content cards will be managed by ScrollTracker */}
             </div>
           </section>
         ))}

@@ -91,7 +91,41 @@ h2 {
   pointer-events: none;
 }
 
-/* Card styling to match original CSS */
+.homepage-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(32, 16, 16, 0.50);
+  z-index: 15;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.homepage-overlay.active {
+  opacity: 1;
+  pointer-events: none;
+}
+
+/* Retry button styling */
+.retry-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.retry-button:hover {
+  background: #0056b3;
+}
+
+/* Card styling to match original CSS with fade effect */
 .card {
   max-width: 968px;
   margin-left: auto;
@@ -99,7 +133,7 @@ h2 {
   position: static;
   z-index: 1;
   top: 0;
-  transition: 0.2s;
+  transition: opacity 0.5s ease;
   opacity: 1;
   cursor: default;
   height: 100px;
@@ -116,7 +150,7 @@ h2 {
   display: none;
   color: rgba(245, 245, 245, 0.9);
   padding-top: 50px;
-  z-index: 3;
+  z-index: 20;
   font-weight: 500;
   position: fixed;
   top: 0;
@@ -146,11 +180,26 @@ h2 {
   color: rgba(255, 100, 100, 0.9);
 }
 
+/* Slide card fade effect */
+.slide_10 {
+  transition: opacity 0.5s ease;
+}
+
+.slide_10.opened {
+  opacity: 1;
+  animation: fadeInCard 0.5s ease;
+}
+
+@keyframes fadeInCard {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .slide_10.opened .card-header {
   position: fixed;
   width: fit-content;
   left: 77px;
-  z-index: 20;
+  z-index: 40;
 }
 
 .slide_10.opened .card-content {
@@ -191,7 +240,7 @@ h2 {
   transition: transform 0.5s ease;
   vertical-align: top;
   width: 100vw;
-  z-index: 2;
+  z-index: 30;
   text-align: center;
   animation-name: glow;
   opacity: 0.75;
@@ -221,7 +270,7 @@ h2 {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2;
+  z-index: 30;
   cursor: pointer;
 }
 

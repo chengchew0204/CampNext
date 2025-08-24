@@ -24,6 +24,7 @@ export async function fetchWordPressPosts(lang: string = 'en'): Promise<Processe
       .map(post => {
         const processedPost: ProcessedPost = {
           id: post.id,
+          title: post.title.rendered,
         };
         
         // Special handling for Map/Mapa - add manual background image

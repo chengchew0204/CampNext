@@ -33,10 +33,16 @@ export function useWordPressContent(): UseWordPressContentReturn {
     })));
 
     try {
-      const response = await fetch(`https://camp.mx/wp-json/wp/v2/posts/${postId}`);
+      const response = await fetch(`/api/wordpress?postId=${postId}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+        cache: 'no-cache'
+      });
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
       }
       
       const post = await response.json();

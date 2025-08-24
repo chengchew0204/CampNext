@@ -2,23 +2,22 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { getSlideTitleById } from '@/utils/slideTitles';
-import { useWordPressContent } from '@/hooks/useWordPressContent';
 import Image from 'next/image';
+import ContentCard from './ContentCard';
+import SEOManager from './SEOManager';
+import { ProcessedPost } from '@/types/wordpress';
 
 interface ScrollTrackerProps {
-  posts: Array<{ id: number }>;
+  posts: ProcessedPost[];
 }
 
 export default function ScrollTracker({ posts }: ScrollTrackerProps) {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [scrollY, setScrollY] = useState(0);
   const [isClient, setIsClient] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [cardStates, setCardStates] = useState<Map<number, boolean>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
-  
-  // WordPress content management
-  const { fetchPostContent, getPostContent } = useWordPressContent();
 
   // Menu data with post IDs and titles
   const menuItems = [
@@ -37,17 +36,19 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
     { id: '18971', title: 'CONTRIBUIR', postId: 18971 }
   ];
 
-  const handleTitleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent screen click handler from firing
-    console.log('Title clicked, current state:', isExpanded);
-    
-    const newExpandedState = !isExpanded;
-    setIsExpanded(newExpandedState);
-    
-    // If expanding, fetch content for current post
-    if (newExpandedState && posts[currentSlideIndex]) {
-      fetchPostContent(posts[currentSlideIndex].id);
-    }
+  // Handle card state changes
+  const handleCardStateChange = (postId: number, isOpen: boolean) => {
+    setCardStates(prev => {
+      const newStates = new Map(prev);
+      if (isOpen) {
+        // Close all other cards when opening a new one
+        newStates.clear();
+        newStates.set(postId, true);
+      } else {
+        newStates.delete(postId);
+      }
+      return newStates;
+    });
   };
 
   const handleMenuToggle = (e: React.MouseEvent) => {
@@ -84,30 +85,20 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
     setIsMenuOpen(false);
   };
 
+  // Close all cards when slide changes
+  useEffect(() => {
+    setCardStates(new Map());
+  }, [currentSlideIndex]);
+
   useEffect(() => {
     // Set client flag to avoid hydration mismatch
     setIsClient(true);
     
     // Keyboard accessibility
     const handleKeyDown = (e: KeyboardEvent) => {
-      // ESC key to close expanded card
-      if (e.key === 'Escape' && isExpanded) {
-        setIsExpanded(false);
-        if (posts[currentSlideIndex]) {
-          // Optionally clear content when closing with ESC
-          // clearPostContent(posts[currentSlideIndex].id);
-        }
-      }
-      
-      // Enter or Space to toggle card when focused on title
-      if ((e.key === 'Enter' || e.key === ' ') && document.activeElement?.closest('.slide-title-container')) {
-        e.preventDefault();
-        const newExpandedState = !isExpanded;
-        setIsExpanded(newExpandedState);
-        
-        if (newExpandedState && posts[currentSlideIndex]) {
-          fetchPostContent(posts[currentSlideIndex].id);
-        }
+      // ESC key to close all cards
+      if (e.key === 'Escape') {
+        setCardStates(new Map());
       }
     };
     
@@ -121,36 +112,11 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
       }
     };
 
-    // Add click handler to scroll container
-    const handleContainerClick = (e: Event) => {
-      const mouseEvent = e as MouseEvent;
-      // Only respond to left mouse button clicks, not scroll events
-      if (mouseEvent.button !== 0) return;
-      
-      // Don't trigger if clicking on interactive elements (buttons, titles, logo, menu)
-      const target = e.target as HTMLElement;
-      if (target.closest('button') || 
-          target.closest('.pointer-events-auto') ||
-          target.closest('.menu-item')) {
-        return;
-      }
-      
-      console.log('Screen background clicked, current state:', isExpanded);
-      
-      const newExpandedState = !isExpanded;
-      setIsExpanded(newExpandedState);
-      
-      // If expanding, fetch content for current post
-      if (newExpandedState && posts[currentSlideIndex]) {
-        fetchPostContent(posts[currentSlideIndex].id);
-      }
-    };
+    // No need for container click handler - cards manage their own state
 
     // Create intersection observer to track which section is most visible
     const scrollContainer = document.querySelector('.scroll-container');
     if (scrollContainer) {
-      // Add click event listener to scroll container
-      scrollContainer.addEventListener('click', handleContainerClick);
       
       observerRef.current = new IntersectionObserver(
         (entries) => {
@@ -189,10 +155,9 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
       const scrollContainer = document.querySelector('.scroll-container');
       if (scrollContainer) {
         scrollContainer.removeEventListener('scroll', handleScroll);
-        scrollContainer.removeEventListener('click', handleContainerClick);
       }
     };
-  }, [posts, isExpanded, currentSlideIndex, fetchPostContent]);
+  }, [posts, currentSlideIndex]);
 
   // Current post and title are available if needed for future features
 
@@ -216,13 +181,6 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
         </div>
 
         {/* Bottom Right - Language Icon */}
-        <div className="absolute bottom-6 right-6 pointer-events-auto">
-          <button className="p-2 text-white hover:text-gray-300 transition-colors">
-            <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-              <path d="M10,10.1L0,4.7C0.1,3.2,1.4,2,3,2h14c1.6,0,2.9,1.2,3,2.8L10,10.1z M10,11.8c-0.1,0-0.2,0-0.4-0.1L0,6.4V15c0,1.7,1.3,3,3,3h4.9h4.3H17c1.7,0,3-1.3,3-3V6.4l-9.6,5.2C10.2,11.7,10.1,11.7,10,11.8z" fill="currentColor"></path>
-            </svg>
-          </button>
-        </div>
       </div>
     );
   }
@@ -231,8 +189,29 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
 
   return (
     <>
-      {/* Content Overlay */}
-      <div className={`content-overlay ${isExpanded ? 'active' : ''}`} />
+      {/* SEO Management */}
+      <SEOManager 
+        posts={posts}
+        currentSlideIndex={currentSlideIndex}
+        isCardOpen={cardStates.size > 0}
+      />
+      
+      {/* Content Overlay - managed by individual cards */}
+      <div className={`content-overlay ${cardStates.size > 0 ? 'active' : ''}`} />
+      
+      {/* Fixed Burger Menu */}
+      <div className="fixed left-3 top-3 pointer-events-auto z-30">
+        <button 
+          className="p-2 text-white hover:text-gray-300 transition-colors"
+          onClick={handleMenuToggle}
+        >
+          <svg className="ct-icon" width="36" height="36" viewBox="0 0 18 14" aria-hidden="true" data-type="type-1">
+            <rect y="0.00" width="18" height="2.9" rx="1" fill="currentColor"></rect>
+            <rect y="6.15" width="18" height="2.9" rx="1" fill="currentColor"></rect>
+            <rect y="12.3" width="18" height="2.9" rx="1" fill="currentColor"></rect>
+          </svg>
+        </button>
+      </div>
       
       {/* Menu Overlay */}
       <div className={`fixed inset-0 z-30 transition-opacity duration-300 ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
@@ -246,7 +225,7 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
                   onClick={(e) => handleMenuClick(e, item.postId, item.isSpecial)}
                   style={{ position: item.isSpecial ? 'relative' : 'static' }}
                 >
-                  {item.title}
+                  {item.title.toUpperCase()}
                   {item.isSpecial && (
                     <>
                       <Image 
@@ -278,155 +257,19 @@ export default function ScrollTracker({ posts }: ScrollTrackerProps) {
           </ul>
         </div>
       </div>
-      {/* Fixed Burger Menu */}
-      <div className="fixed left-3 top-3 pointer-events-auto flex items-center gap-4 z-20">
-        <button 
-          className="p-2 text-white hover:text-gray-300 transition-colors"
-          onClick={handleMenuToggle}
-        >
-          <svg className="ct-icon" width="36" height="36" viewBox="0 0 18 14" aria-hidden="true" data-type="type-1">
-            <rect y="0.00" width="18" height="2.9" rx="1" fill="currentColor"></rect>
-            <rect y="6.15" width="18" height="2.9" rx="1" fill="currentColor"></rect>
-            <rect y="12.3" width="18" height="2.9" rx="1" fill="currentColor"></rect>
-          </svg>
-        </button>
-      </div>
-
-      {/* Sliding Titles */}
-      {posts.map((post, index) => {
-        const title = getSlideTitleById(post.id);
-        const slideOffset = index * windowHeight - scrollY;
-        const isVisible = Math.abs(slideOffset) < windowHeight;
-        
-        return (
-          <div
-            key={post.id}
-            className="fixed pointer-events-auto z-20"
-            style={{
-              left: '84px', // Position next to the burger menu
-              top: `${24 + slideOffset}px`, // Align with burger menu center
-              opacity: isVisible ? 1 : 0,
-              transition: 'opacity 0.3s ease-out'
-            }}
-          >
-            <div 
-              className="bg-white/90 backdrop-blur-sm px-2 py-0.9 cursor-pointer hover:bg-white/95 transition-colors"
-              style={{
-                transform: 'scale(1.1)'
-              }}
-              onClick={handleTitleClick}
-            >
-              <h2 className={`text-black font-bold text-lg tracking-wide ${isExpanded ? 'expanded' : ''}`}>
-                {title}
-              </h2>
-            </div>
-          </div>
-        );
-      })}
       
-      {/* Keep other overlay elements */}
-      <div className="fixed inset-0 z-20 pointer-events-none">
-        {/* Top Right - Logo */}
-        <div 
-          className="absolute top-5 right-5 pointer-events-auto"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="w-25 h-25">
-            <Image
-              width={100}
-              height={100}
-              src="https://camp.mx/wp-content/uploads/2023/12/logo.png"
-              className="default-logo w-full h-full object-contain"
-              alt="CAMP"
-            />
-          </div>
-        </div>
-
-        {/* Bottom Right - Language Icon */}
-      </div>
-      
-      {/* Card Content Area */}
-      {isExpanded && posts[currentSlideIndex] && (
-        <div className="slide_10 opened">
-          <div className="card">
-            <div className="card-content">
-              <div className="card-content-container">
-                {(() => {
-                  const contentState = getPostContent(posts[currentSlideIndex].id);
-                  
-                  if (contentState.loading) {
-                    return (
-                      <div className="card-content-loading">
-                        <p>Loading content...</p>
-                      </div>
-                    );
-                  }
-                  
-                  if (contentState.error) {
-                    return (
-                      <div className="card-content-error">
-                        <p>Error loading content: {contentState.error}</p>
-                      </div>
-                    );
-                  }
-                  
-                  if (contentState.content) {
-                    return (
-                      <div 
-                        dangerouslySetInnerHTML={{ 
-                          __html: contentState.content 
-                        }}
-                      />
-                    );
-                  }
-                  
-                  return (
-                    <div className="card-content-loading">
-                      <p>Click to load content...</p>
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Caret indicator when not expanded */}
-      {!isExpanded && posts[currentSlideIndex] && (
-        <div className="slide_10">
-          <div className="caretdiv" onClick={handleTitleClick}>
-            <a>
-              <Image 
-                src="https://camp.mx/img/caret28.svg" 
-                alt="Expand content" 
-                width={28}
-                height={28}
-                style={{ 
-                  filter: 'invert(1)', 
-                  width: '28px', 
-                  height: '28px' 
-                }} 
-              />
-            </a>
-          </div>
-          
-          {/* Mobile caret for iPhone */}
-          <div className="caretdiviphone" onClick={handleTitleClick}>
-            <Image 
-              src="https://camp.mx/img/caret28.svg" 
-              alt="Expand content" 
-              width={28}
-              height={28}
-              style={{ 
-                filter: 'invert(1)', 
-                width: '28px', 
-                height: '28px' 
-              }} 
-            />
-          </div>
-        </div>
-      )}
+      {/* Content Cards - positioned to scroll with slides */}
+      {posts.map((post, index) => (
+        <ContentCard
+          key={post.id}
+          postId={post.id}
+          title={post.title || getSlideTitleById(post.id)}
+          isVisible={index === currentSlideIndex}
+          scrollY={scrollY}
+          slideIndex={index}
+          onStateChange={handleCardStateChange}
+        />
+      ))}
     </>
   );
 }

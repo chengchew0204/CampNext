@@ -16,6 +16,7 @@ export interface WordPressPost {
 
 export interface ProcessedPost {
   id: number;
+  title?: string;
   featureImage?: string;
   videoUrl?: string;
 }
