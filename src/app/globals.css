@@ -1,5 +1,38 @@
 @import "tailwindcss";
 
+/* ClearSans Font Face Declarations */
+@font-face {
+  font-family: 'ClearSans';
+  font-weight: 300;
+  font-style: normal;
+  src: url('https://camp.mx/font/clear-sans/woff2/ClearSans-Light.woff2') format('woff2'),
+       url('https://camp.mx/font/clear-sans/ttf/ClearSans-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'ClearSans';
+  font-weight: 400;
+  font-style: normal;
+  src: url('https://camp.mx/font/clear-sans/woff2/ClearSans-Regular.woff2') format('woff2'),
+       url('https://camp.mx/font/clear-sans/ttf/ClearSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'ClearSans';
+  font-weight: 500;
+  font-style: normal;
+  src: url('https://camp.mx/font/clear-sans/woff2/ClearSans-Medium.woff2') format('woff2'),
+       url('https://camp.mx/font/clear-sans/ttf/ClearSans-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'ClearSans';
+  font-weight: 700;
+  font-style: normal;
+  src: url('https://camp.mx/font/clear-sans/woff2/ClearSans-Bold.woff2') format('woff2'),
+       url('https://camp.mx/font/clear-sans/ttf/ClearSans-Bold.ttf') format('truetype');
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -22,7 +55,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'ClearSans', Helvetica, sans-serif;
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -293,6 +326,7 @@ h2 {
 }
 
 .card h4 {
+  font-family: 'ClearSans', Helvetica, sans-serif;
   font-size: 24px;
   letter-spacing: 0.22px;
   line-height: 32px;
@@ -303,12 +337,14 @@ h2 {
 }
 
 .card h3 {
+  font-family: 'ClearSans', Helvetica, sans-serif;
   font-size: 24px;
   margin: 0;
   color: rgba(245, 245, 245, 0.85);
 }
 
 .card .slide-title {
+  font-family: 'ClearSans', Helvetica, sans-serif;
   font-size: 33px;
 }
 
@@ -330,10 +366,12 @@ h2 {
 
 .card-content a {
   color: rgba(245, 245, 245, 0.9);
+  font-family: 'ClearSans', Helvetica, sans-serif;
   font-weight: 500;
 }
 
 .card-content p {
+  font-family: 'ClearSans', Helvetica, sans-serif;
   line-height: 1.6;
   margin-bottom: 20px;
 }
@@ -381,6 +419,7 @@ h2 {
 /* Menu item styling */
 .menu-item {
   color: rgba(245, 245, 245, 0.95) !important;
+  font-family: 'ClearSans', Helvetica, sans-serif;
   font-weight: 500;
   font-size: 22px;
   text-shadow: rgba(0, 0, 0, 1) 0 0 30px, rgba(0, 0, 0, 0.8) 0 0 30px;
